@@ -29,13 +29,14 @@ public struct OpenAIClient {
             + prevMessages
             + [.ChatCompletionRequestUserMessage(.init(content: .case1(prompt), role: .user))],
             model: .init(value1: nil, value2: model))))
-        
+           
         switch response {
         case .ok(let body):
             let json = try body.body.json
             guard let content = json.choices.first?.message.content else {
                 throw "No Response"
             }
+            
             return content
         case .undocumented(let statusCode, let payload):
             throw "OpenAIClientError - statuscode: \(statusCode), \(payload)"
@@ -48,14 +49,19 @@ public struct OpenAIClient {
         model: Components.Schemas.CreateChatCompletionRequest.modelPayload.Value2Payload = .gpt_hyphen_4,
         assistantPrompt: String = "You are a helpful assistant"
         ) async throws -> String {
+        
+        Logger.shared.log(message: "Prompt: \(prompt)", level: .info)
+        Logger.shared.log(message: "Assistant Prompt: \(assistantPrompt)", level: .info)
             
         conversationHistory.append(.ChatCompletionRequestAssistantMessage(.init(content: assistantPrompt, role: .assistant)))
         conversationHistory.append(.ChatCompletionRequestUserMessage(.init(content: .case1(prompt), role: .user)))
-            
+        
+        Logger.shared.log(message: "Chat History: \(conversationHistory)", level: .info)
+        
         let response = try await client.createChatCompletion(body: .json(.init(
             messages: conversationHistory,
             model: .init(value1: nil, value2: model))))
-        
+        Logger.shared.log(message: "OpenAI Response: \(response)", level: .info)
         switch response {
         case .ok(let body):
             let json = try body.body.json
