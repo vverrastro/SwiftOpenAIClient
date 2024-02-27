@@ -53,21 +53,22 @@ public struct OpenAIClient {
         Logger.shared.log(message: "Prompt: \(prompt)", level: .info)
         Logger.shared.log(message: "Assistant Prompt: \(assistantPrompt)", level: .info)
             
-        conversationHistory.append(.ChatCompletionRequestAssistantMessage(.init(content: assistantPrompt, role: .assistant)))
         conversationHistory.append(.ChatCompletionRequestUserMessage(.init(content: .case1(prompt), role: .user)))
         
-        Logger.shared.log(message: "Chat History: \(conversationHistory)", level: .info)
+        Logger.shared.log(message: "Chat History:\n\(formatConversationHistory(conversationHistory))", level: .info)
         
         let response = try await client.createChatCompletion(body: .json(.init(
             messages: conversationHistory,
             model: .init(value1: nil, value2: model))))
-        Logger.shared.log(message: "OpenAI Response: \(response)", level: .info)
+        
         switch response {
         case .ok(let body):
             let json = try body.body.json
+            Logger.shared.log(message: "OpenAI Body Response: \(body)", level: .info)
             guard let content = json.choices.first?.message.content else {
                 throw "No Response"
             }
+            conversationHistory.append(.ChatCompletionRequestAssistantMessage(.init(content: content, role: .assistant)))
             return content
         case .undocumented(let statusCode, let payload):
             throw "OpenAIClientError - statuscode: \(statusCode), \(payload)"
@@ -194,6 +195,28 @@ public struct OpenAIClient {
     
     public mutating func resetConversationHistory() {
         conversationHistory = []
+    }
+    
+    private func formatConversationHistory(_ history: [Components.Schemas.ChatCompletionRequestMessage]) -> String {
+        var formattedMessages = [String]()
+        
+        for message in history {
+            switch message {
+            case .ChatCompletionRequestAssistantMessage(let assistantMessage):
+                // Assumendo che `content` sia un Optional<String>
+                if let content = assistantMessage.content {
+                    formattedMessages.append("Assistant: \(content)")
+                }
+            case .ChatCompletionRequestUserMessage(let userMessage):
+                // Assumendo che `content` sia un Optional<String> o una struttura simile
+                if let content = userMessage.content {
+                    formattedMessages.append("User: \(content)")
+                }
+            default: formattedMessages.append("NA: NA")
+            }
+        }
+        
+        return formattedMessages.joined(separator: "\n")
     }
     
 }
