@@ -56,10 +56,12 @@ public struct OpenAIClient {
             }
             return false
         }
+        Logger.shared.log(message: "System messagge before: \(systemMessageExists)", level: .info)
 
         if !systemMessageExists {
             conversationHistory.insert(.ChatCompletionRequestSystemMessage(.init(content: assistantPrompt, role: .system)), at: 0)
         }
+        Logger.shared.log(message: "System messagge after: \(systemMessageExists)", level: .info)
         
         Logger.shared.log(message: "Prompt: \(prompt)", level: .info)
         Logger.shared.log(message: "Assistant Prompt: \(assistantPrompt)", level: .info)
