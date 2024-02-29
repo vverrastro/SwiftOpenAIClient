@@ -215,17 +215,19 @@ public struct OpenAIClient {
         
         for message in history {
             switch message {
+            case .ChatCompletionRequestSystemMessage(let systemMessage):
+                if let content = systemMessage.content {
+                    formattedMessages.append("System: \(content)")
+                }
             case .ChatCompletionRequestAssistantMessage(let assistantMessage):
-                // Assumendo che `content` sia un Optional<String>
                 if let content = assistantMessage.content {
                     formattedMessages.append("Assistant: \(content)")
                 }
             case .ChatCompletionRequestUserMessage(let userMessage):
-                // Assumendo che `content` sia un Optional<String> o una struttura simile
                 if let content = userMessage.content {
                     formattedMessages.append("User: \(content)")
                 }
-            default: formattedMessages.append("NA: NA")
+            default: formattedMessages.append("Undefinied role: NA")
             }
         }
         
