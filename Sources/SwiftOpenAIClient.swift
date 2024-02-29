@@ -49,6 +49,17 @@ public struct OpenAIClient {
         model: Components.Schemas.CreateChatCompletionRequest.modelPayload.Value2Payload = .gpt_hyphen_4,
         assistantPrompt: String = "You are a helpful assistant"
         ) async throws -> String {
+            
+        let systemMessageExists = conversationHistory.contains { message in
+            if case let .ChatCompletionRequestSystemMessage(assistantMessage) = message, assistantMessage.role == .system, assistantMessage.content == assistantPrompt {
+                return true
+            }
+            return false
+        }
+
+        if !systemMessageExists {
+            conversationHistory.insert(.ChatCompletionRequestSystemMessage(.init(content: assistantPrompt, role: .system)), at: 0)
+        }
         
         Logger.shared.log(message: "Prompt: \(prompt)", level: .info)
         Logger.shared.log(message: "Assistant Prompt: \(assistantPrompt)", level: .info)
