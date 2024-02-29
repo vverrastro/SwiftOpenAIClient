@@ -60,9 +60,6 @@ public struct OpenAIClient {
         if !systemMessageExists {
             conversationHistory.insert(.ChatCompletionRequestSystemMessage(.init(content: assistantPrompt, role: .system)), at: 0)
         }
-        
-        Logger.shared.log(message: "Prompt: \(prompt)", level: .info)
-        Logger.shared.log(message: "Assistant Prompt: \(assistantPrompt)", level: .info)
             
         conversationHistory.append(.ChatCompletionRequestUserMessage(.init(content: .case1(prompt), role: .user)))
         
@@ -213,17 +210,19 @@ public struct OpenAIClient {
         
         for message in history {
             switch message {
+            case .ChatCompletionRequestSystemMessage(let systemMessage):
+                if let content = systemMessage.content {
+                    formattedMessages.append("System: \(content)")
+                }
             case .ChatCompletionRequestAssistantMessage(let assistantMessage):
-                // Assumendo che `content` sia un Optional<String>
                 if let content = assistantMessage.content {
                     formattedMessages.append("Assistant: \(content)")
                 }
             case .ChatCompletionRequestUserMessage(let userMessage):
-                // Assumendo che `content` sia un Optional<String> o una struttura simile
                 if let content = userMessage.content {
                     formattedMessages.append("User: \(content)")
                 }
-            default: formattedMessages.append("NA: NA")
+            default: formattedMessages.append("Undefinied role: NA")
             }
         }
         
