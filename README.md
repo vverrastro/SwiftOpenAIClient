@@ -28,7 +28,14 @@ let openAIClient = OpenAIClient(apiKey: apiKey)
 
 // Making a Chat Completion Request
 let prompt = "Hello, who won the world series in 2020?"
-let response = try await openAIClient.promptChatGPT(prompt: prompt, model: .gpt_4, assistantPrompt: "You are a helpful assistant")
+let response = try await openAIClient.promptChatGPT(prompt: prompt, model: .gpt_4, assistantPrompt: "You are my special assistant")
+print(response)
+// Making a Chat Completion Request with Context
+let prompt = "Hello, who won the world series in 2020?"
+let response = try await openAIClient.promptChatGPTWithContext(prompt: prompt, model: .gpt_4, assistantPrompt: "You are my special assistant")
+print(response)
+prompt = "In 2016 instead?"
+response = try await openAIClient.promptChatGPTWithContext(prompt: prompt, model: .gpt_4, assistantPrompt: "You are my special assistant")
 print(response)
 
 // Generating Speech from Text
