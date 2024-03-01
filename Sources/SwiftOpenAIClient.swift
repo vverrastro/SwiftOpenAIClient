@@ -33,6 +33,7 @@ public struct OpenAIClient {
         switch response {
         case .ok(let body):
             let json = try body.body.json
+            Logger.shared.log(message: "OpenAI Body Response: \(json)", level: .info)
             guard let content = json.choices.first?.message.content else {
                 throw "No Response"
             }
@@ -72,7 +73,7 @@ public struct OpenAIClient {
         switch response {
         case .ok(let body):
             let json = try body.body.json
-            Logger.shared.log(message: "OpenAI Body Response: \(body)", level: .info)
+            Logger.shared.log(message: "OpenAI Body Response: \(json)", level: .info)
             guard let content = json.choices.first?.message.content else {
                 throw "No Response"
             }
